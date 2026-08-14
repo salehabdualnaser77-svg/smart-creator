@@ -1,8 +1,8 @@
-name: Build Android APK
+name: Build Smart Creator APK
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
@@ -10,31 +10,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'zulu'
-        java-version: '17'
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-    - name: Grant Execute Permission to Gradlew
-      run: |
-        if [ ! -f gradlew ]; then
-          gradle wrapper
-        fi
-        chmod +x gradlew
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-    - name: Build Debug APK
-      run: ./gradlew assembleDebug --no-daemon
+      - name: Setup Project & Capacitor
+        run: |
+          mkdir -p www
+          # نسخ ملفات المشروع لبيئة الويب
+          cp -r index.html www/ 2>/dev/null || true
+          cp -r *.js www/ 2>/dev/null || true
+          cp -r *.css www/ 2>/dev/null || true
+          cp -r assets www/ 2>/dev/null || true
+          cp -r img www/ 2>/dev/null || true
+          
+          # إعداد Capacitor بنسخة مستقرة
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "Smart Creator" "com.smartcreator.app" --web-dir www
+          npx cap add android
+          npx cap sync android
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: SmartCreator-App
-        path: app/build/outputs/apk/debug/*.apk
-        if-no-files-found: error
+      - name: Build Debug APK
+        run: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartCreator-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
