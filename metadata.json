@@ -1,0 +1,8 @@
+{
+  "name": "Remix سمارت كريتور",
+  "description": "تطبيق سمارت كريتور لإدارة شبكات المايكروتك، الهوتسبوت، اليوزرمانجر، طباعة وتوليد الكروت، ومراقبة المتصلين",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
