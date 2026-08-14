@@ -25,19 +25,17 @@ jobs:
       - name: Accept Android Licenses
         run: yes | sdkmanager --licenses || true
 
-      - name: Setup Gradle 8.7
+      - name: Setup Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.7'
+          gradle-version: '9.3.1'
           cache-disabled: true
 
       - name: Build Debug APK
         run: |
-          if [ ! -f "gradlew" ]; then
-            gradle wrapper --gradle-version 8.7
-          fi
+          gradle wrapper --gradle-version 9.3.1 --distribution-type bin
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --no-configuration-cache --stacktrace -Dorg.gradle.jvmargs="-Xmx4096m"
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload Finished APK
         uses: actions/upload-artifact@v4
