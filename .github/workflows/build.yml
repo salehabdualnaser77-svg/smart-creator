@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      JAVA_OPTS: "-Djava.awt.headless=true"
+      _JAVA_OPTIONS: "-Djava.awt.headless=true"
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -35,7 +39,13 @@ jobs:
         run: |
           gradle wrapper --gradle-version 9.3.1 --distribution-type bin
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleDebug \
+            --no-daemon \
+            --stacktrace \
+            -Djava.awt.headless=true \
+            -Dorg.gradle.jvmargs="-Xmx4096m -Djava.awt.headless=true" \
+            -Pksp.incremental=false \
+            -Pksp.run.in.process=false
 
       - name: Upload Finished APK
         uses: actions/upload-artifact@v4
